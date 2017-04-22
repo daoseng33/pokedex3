@@ -21,7 +21,6 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
         
         collectionView.dataSource = self
         collectionView.delegate = self
@@ -60,7 +59,7 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
             // Get CSV data
             let csv = try CSV(contentsOfURL: path)
             let rows = csv.rows
-            print(rows)
+//            print(rows)
             
             for row in rows {
                 let pokeId = Int(row["id"]!)!
@@ -122,7 +121,16 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
     // MARK: CollectionView Delegate
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         searchBar.endEditing(true)
-        print("Selected index \(indexPath.row)")
+//        print("Selected index \(indexPath.row)")
+        
+        let poke: Pokemon!
+        if inSearchMode {
+            poke = filteredPokemon[indexPath.row]
+        } else {
+            poke = pokemon[indexPath.row]
+        }
+        
+        performSegue(withIdentifier: "PokemonDetailVC", sender: poke)
     }
     
     // MARK: CollectionView Layout
@@ -168,6 +176,16 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
             
         }
         
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "PokemonDetailVC" {
+            if let detailVC = segue.destination as? PokemonDetailVC {
+                if let poke = sender as? Pokemon {
+                    detailVC.pokemon = poke
+                }
+            }
+        }
     }
 }
 
